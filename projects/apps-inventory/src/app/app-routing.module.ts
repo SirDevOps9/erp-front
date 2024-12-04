@@ -9,6 +9,7 @@ const routes: Routes = [
     component: LayoutPageComponent,
     data: {
       moduleId: Modules.inventory,
+      
     },
     children: [
       {
