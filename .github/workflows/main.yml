@@ -24,9 +24,14 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
-      # Step 3: Install dependencies with --force
-      - name: Install dependencies
-        run: npm install --force
+      # Step 3: Install or update dependencies with --force
+      - name: Update dependencies and install
+        run: |
+          # Force an update for specific packages (e.g., @trademe/ng-defer-load)
+          npm install @trademe/ng-defer-load@latest --force || echo "Package update failed"
+          
+          # Install all dependencies with --force to bypass conflicts
+          npm install --force
 
       # Step 4: Build the adminportal project
       - name: Build adminportal
