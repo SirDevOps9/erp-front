@@ -6,7 +6,7 @@ on:
 jobs:
   angular:
     name: Angular Build
-    runs-on: self-hosted
+    runs-on: self-hosted  # Update if using a specific runner
     strategy:
       matrix:
         node-version: [20] # Use Node.js version 20.x
@@ -28,15 +28,16 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # Step 4: Build the adminportal project
-      - name: Build adminportal
-        run: npm run build:adminportal
-
-      # Step 5: Install gzip (for tar command)
-      - name: Install gzip
-        run: sudo apt-get install gzip
-
-      # Step 6: Post-job cleanup (if necessary)
-      - name: Post-job cleanup (optional)
+      # Step 4: Build adminportal and run post-build (PowerShell)
+      - name: Build adminportal with PowerShell
+        shell: pwsh  # Use PowerShell shell
         run: |
-          tar -cf cache.tgz --exclude cache.tgz -P -C C:/actions-runner1/_work/erp-front/erp-front --files-from manifest.txt --force-local
+          # Set environment variables
+          $env:PROJECT_NAME="adminportal"
+          $env:OUTPUT_PATH="frontadmin"
+          
+          # Run Angular build for the adminportal project
+          ng build --project adminportal
+          
+          # Run post-build script
+          node post-build.js
