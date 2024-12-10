@@ -24,15 +24,19 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
-      # Step 3: Install or update dependencies with --force
-      - name: Update dependencies and install
-        run: |
-          # Force an update for specific packages (e.g., @trademe/ng-defer-load)
-          npm install @trademe/ng-defer-load@latest --force || echo "Package update failed"
-          
-          # Install all dependencies with --force to bypass conflicts
-          npm install --force
+      # Step 3: Install dependencies with --legacy-peer-deps
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
 
       # Step 4: Build the adminportal project
       - name: Build adminportal
         run: npm run build:adminportal
+
+      # Step 5: Install gzip (for tar command)
+      - name: Install gzip
+        run: sudo apt-get install gzip
+
+      # Step 6: Post-job cleanup (if necessary)
+      - name: Post-job cleanup (optional)
+        run: |
+          tar -cf cache.tgz --exclude cache.tgz -P -C C:/actions-runner1/_work/erp-front/erp-front --files-from manifest.txt --force-local
