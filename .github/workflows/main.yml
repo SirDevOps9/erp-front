@@ -29,15 +29,18 @@ jobs:
       - name: Build all projects
         run: npm run build:all
 
-      # Step 5: Deploy build files to C:\actions-runner1\_work
-      - name: Deploy build files to C:\actions-runner1\_work
+      # Step 5: Deploy build files to D:\myf
+      - name: Deploy build files to D:\myf
         run: |
-          echo "Deploying build files to C:/actions-runner1/_work..."
-          
+          echo "Deploying build files to D:/myf..."
+
+          # Define the target directory (D:\myf)
+          $destination = "D:/myf"
+
           # Ensure the target directory exists
-          if (!(Test-Path "C:\actions-runner1\_work\erp-front\erp-front\dist")) {
-            New-Item -Path "C:\actions-runner1\_work\erp-front\erp-front\dist" -ItemType Directory
+          if (!(Test-Path $destination)) {
+            New-Item -Path $destination -ItemType Directory
           }
 
           # Copy build files from dist folder to the target directory
-          Copy-Item -Recurse -Force "dist\*" "C:\actions-runner1\_work\erp-front\erp-front\dist\"
+          Copy-Item -Recurse -Force "dist\*" $destination
