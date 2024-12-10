@@ -1,15 +1,12 @@
-name: Build
+name: Build and Deploy Frontend
 
 on:
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch:  # Manual trigger
 
 jobs:
-  angular:
-    name: Angular Build
-    runs-on: self-hosted  # Update if using a specific runner
-    strategy:
-      matrix:
-        node-version: [20] # Use Node.js version 20.x
+  build:
+    name: Build and Deploy Frontend
+    runs-on: self-hosted  # Ensure the runner is Windows-based
 
     steps:
       # Step 1: Checkout the source code
@@ -20,24 +17,25 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20.18.1
+          node-version: 20.18.1  # Use the Node.js version required for your project
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
       # Step 3: Install dependencies with --legacy-peer-deps
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps  # Include --legacy-peer-deps if needed
 
-      # Step 4: Build adminportal and run post-build (PowerShell)
-      - name: Build adminportal with PowerShell
-        shell: pwsh  # Use PowerShell shell
+      # Step 4: Run the "build:all" script
+      - name: Build all projects
+        run: npm run build:all
+
+      # Step 5: Deploy build files to D:/FE on Windows
+      - name: Deploy build files to D:/FE
         run: |
-          # Set environment variables
-          $env:PROJECT_NAME="adminportal"
-          $env:OUTPUT_PATH="frontadmin"
-          
-          # Run Angular build for the adminportal project
-          ng build --project adminportal
-          
-          # Run post-build script
-          node post-build.js
+          echo "Deploying build files to D:/FE..."
+          # Ensure the target directory exists
+          if (!(Test-Path "D:\FE")) {
+            New-Item -Path "D:\FE" -ItemType Directory
+          }
+          # Copy build files from dist folder to D:/FE
+          Copy-Item -Recurse -Force "dist\*" "D:\FE\"
